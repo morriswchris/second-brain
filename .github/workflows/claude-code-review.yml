@@ -1,0 +1,38 @@
+name: Claude Code Review
+
+# Automatically reviews every pull request. Claude reads the diff and leaves
+# inline review comments. Requires the same `ANTHROPIC_API_KEY` secret as
+# the Claude Code workflow (or a `CLAUDE_CODE_OAUTH_TOKEN`).
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            Review this pull request for a React Native + Expo (SDK 57) app that
+            must stay compatible with Expo Go. Focus on:
+            - Correctness and potential runtime crashes on iOS and Android.
+            - Expo Go compatibility: flag any new dependency that requires custom
+              native code / a development build (i.e. can't run in Expo Go).
+            - React / React Native best practices and hooks rules.
+            - TypeScript type safety and obvious performance issues.
+            Keep feedback concise and actionable; skip nitpicks already handled
+            by ESLint/Prettier.
