@@ -51,6 +51,37 @@ npm run ios        # open on an iOS simulator (macOS only)
 npm run web        # open in the browser
 ```
 
+## Testing on a device without a local machine
+
+Can't run npm locally? You don't need to. Both of these run in the cloud, work
+over the internet via a tunnel, and use **zero EAS build credits**.
+
+### Option A — GitHub Codespaces (recommended for active development)
+
+A cloud VS Code environment with everything preconfigured (see
+`.devcontainer/`). Live-reload as you edit.
+
+1. On GitHub: **Code → Codespaces → Create codespace** on your branch.
+2. In the Codespace terminal:
+   ```bash
+   npm run tunnel        # = expo start --tunnel
+   ```
+3. Scan the QR with Expo Go (the tunnel makes it reachable from anywhere — your
+   phone does **not** need to be on the same network).
+
+### Option B — On-demand tunnel from GitHub Actions
+
+For a quick device check of a branch without opening a Codespace, run the
+**Tunnel Preview** workflow (`.github/workflows/tunnel-preview.yml`):
+
+1. **Actions → Tunnel Preview (on-demand) → Run workflow** (pick a branch).
+2. Open the running job's **Summary** and scan the QR (or copy the `exp://` URL
+   into Expo Go via **Enter URL manually**).
+3. Cancel the run when finished.
+
+This previews the code at that commit (no live editing — push to update) and is
+time-boxed so it can't run forever.
+
 ## Project structure
 
 ```
@@ -72,6 +103,7 @@ The `@/*` path alias maps to `src/*` (see `tsconfig.json`).
 | Command                 | What it does                                  |
 | ----------------------- | --------------------------------------------- |
 | `npm start`             | Start the Expo dev server (QR for Expo Go)    |
+| `npm run tunnel`        | Start the dev server over a public tunnel     |
 | `npm run android`       | Open on Android                               |
 | `npm run ios`           | Open on iOS (macOS)                           |
 | `npm run web`           | Open in the browser                           |
@@ -105,6 +137,8 @@ Workflows live in `.github/workflows/`:
   implement changes, answer questions, or open a fix PR.
 - **`claude-code-review.yml`** — Claude automatically reviews each pull request
   (with an Expo-Go-compatibility focus) and leaves inline comments.
+- **`tunnel-preview.yml`** — manually-triggered ephemeral Expo dev server over a
+  public tunnel for on-device testing (see "Testing on a device" above).
 
 The two Claude workflows need an `ANTHROPIC_API_KEY` repository secret
 (**Settings → Secrets and variables → Actions**). To use a Claude subscription

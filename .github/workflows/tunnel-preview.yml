@@ -1,0 +1,95 @@
+name: Tunnel Preview (on-demand)
+
+# Manually-triggered, EPHEMERAL Expo dev server exposed over a public tunnel so
+# you can test a branch on a real device via Expo Go — without running anything
+# locally and without using any EAS build credits.
+#
+# How to use:
+#   1. Actions tab -> "Tunnel Preview (on-demand)" -> Run workflow (pick a branch).
+#   2. Open the running job's Summary; scan the QR / copy the exp:// URL.
+#   3. In Expo Go, scan the QR or use "Enter URL manually" and paste the URL.
+#   4. Cancel the run when you're done (it also auto-stops via the timeout).
+#
+# Caveats: this previews the CODE AT THE CHOSEN COMMIT (no live editing — push
+# to update), the runner is capped well under GitHub's 6h limit, and each run
+# consumes Actions minutes while it's alive, so cancel it when finished.
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: 'How long to keep the tunnel alive (minutes)'
+        required: false
+        default: '60'
+
+permissions:
+  contents: read
+
+jobs:
+  tunnel:
+    runs-on: ubuntu-latest
+    # Hard ceiling so a forgotten run can't burn minutes indefinitely.
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start tunnel and publish the URL
+        env:
+          EXPO_NO_TELEMETRY: '1'
+          KEEP_ALIVE_MINUTES: ${{ github.event.inputs.minutes }}
+        run: |
+          set -euo pipefail
+
+          # Boot the Expo dev server in tunnel mode in the background.
+          npx expo start --tunnel > tunnel.log 2>&1 &
+          EXPO_PID=$!
+
+          # Wait (up to ~5 min) for ngrok to hand back the public exp:// URL.
+          URL=""
+          for _ in $(seq 1 60); do
+            if ! kill -0 "$EXPO_PID" 2>/dev/null; then
+              echo "::error::Expo exited before a tunnel URL was ready. Logs:"
+              cat tunnel.log || true
+              exit 1
+            fi
+            URL="$(grep -oE 'exp://[A-Za-z0-9._-]+\.exp\.direct(:[0-9]+)?' tunnel.log | head -1 || true)"
+            [ -n "$URL" ] && break
+            sleep 5
+          done
+
+          if [ -z "$URL" ]; then
+            echo "::error::Timed out waiting for the tunnel URL. Logs:"
+            cat tunnel.log || true
+            kill "$EXPO_PID" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "Tunnel ready: $URL"
+
+          # Publish a scannable QR + the raw URL to the job Summary page.
+          {
+            echo "# 📱 Expo Go preview is live"
+            echo ""
+            echo "Open **Expo Go** and either scan this QR or use **Enter URL manually**:"
+            echo ""
+            echo "**\`$URL\`**"
+            echo ""
+            echo "![QR](https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=$URL)"
+            echo ""
+            echo "> Cancel this workflow run when you're done to stop using Actions minutes."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Hold the job open so the tunnel stays up, then shut down cleanly.
+          KEEP="${KEEP_ALIVE_MINUTES:-60}"
+          echo "Keeping the tunnel alive for ${KEEP} minute(s). Cancel the run to stop early."
+          sleep "$(( KEEP * 60 ))" || true
+          kill "$EXPO_PID" 2>/dev/null || true
