@@ -1,0 +1,36 @@
+{
+  "name": "second-brain (Expo)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  // --- Setup, ordered so Codespaces Prebuilds can cache it ---
+  // onCreateCommand + updateContentCommand run at PREBUILD time (baked into the
+  // prebuilt image), so a prebuilt Codespace starts with tooling + node_modules
+  // already in place. postCreateCommand would instead run on every create.
+
+  // Global CLI tooling (independent of repo contents).
+  "onCreateCommand": "npm install -g @anthropic-ai/claude-code",
+
+  // Project dependencies. Lives here (not postCreate) so node_modules is cached
+  // in the prebuild and refreshed whenever repo content changes.
+  "updateContentCommand": "npm install",
+
+  // Metro's default port. Tunnel mode doesn't need it forwarded, but it's handy
+  // for the web build / debugging.
+  "forwardPorts": [8081],
+  "portsAttributes": {
+    "8081": { "label": "Expo / Metro" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["expo.vscode-expo-tools", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        // Let the "Expo: tunnel" task (.vscode/tasks.json) start automatically
+        // on open without a prompt.
+        "task.allowAutomaticTasks": "on"
+      }
+    }
+  }
+}

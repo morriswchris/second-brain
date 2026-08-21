@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Auto-starts the Expo tunnel when the Codespace (or VS Code) opens, so
+      // the QR code is waiting for you. Enabled without a prompt via
+      // "task.allowAutomaticTasks": "on" in the devcontainer settings.
+      // Don't want it auto-running? Delete the "runOptions" block below and
+      // start it manually with Terminal > Run Task > "Expo: tunnel".
+      "label": "Expo: tunnel",
+      "type": "shell",
+      "command": "npm run tunnel",
+      "runOptions": { "runOn": "folderOpen" },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}
