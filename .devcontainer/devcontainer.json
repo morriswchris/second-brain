@@ -2,8 +2,9 @@
   "name": "second-brain (Expo)",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
 
-  // Install dependencies once the Codespace is created.
-  "postCreateCommand": "npm install",
+  // Install dependencies and the Claude Code CLI once the Codespace is created,
+  // so you can run both `claude` and `npm run tunnel` in the same environment.
+  "postCreateCommand": "npm install && npm install -g @anthropic-ai/claude-code",
 
   // Metro's default port. Tunnel mode (`npm run tunnel`) doesn't need this
   // forwarded, but it's handy for the web build / debugging.
