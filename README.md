@@ -1,15 +1,8 @@
 # second-brain
 
 A cross-platform (iOS + Android) mobile app built with **Expo** and **React
-Native** — a lightweight, ADHD-friendly task tracker. Capture whatever's on
-your mind fast, flag what matters, and check things off. Tasks are stored
-**on-device** with SQLite, so the app works fully offline and runs in **Expo
-Go** (no dev build required).
-
-**v1 features:** quick-capture add, a **Tasks** list (important-first), star to
-flag, tap to edit/delete, and a **Done** tab to review or clear completed work.
-Reminders/notifications are intentionally out of scope for v1 to stay 100% Expo
-Go compatible.
+Native**, scaffolded for fast local development and on-device testing with
+**Expo Go**. The app is an empty-but-modern starting point — no features yet.
 
 ## Stack
 
@@ -94,23 +87,14 @@ time-boxed so it can't run forever.
 ```
 src/
   app/            # Screens & routes (Expo Router, file-based)
-    _layout.tsx   # Root layout + tab navigator; hydrates tasks on start
-    index.tsx     # Tasks tab — quick-add + active list
-    done.tsx      # Done tab — completed tasks
-  components/     # Reusable UI (task-row, task-edit-modal, themed text/view…)
+    _layout.tsx   # Root layout + tab navigator
+    index.tsx     # Home screen
+    explore.tsx   # Explore screen
+  components/     # Reusable UI (themed text/view, etc.)
   constants/      # Theme tokens (colors, spacing, fonts)
-  db/             # SQLite persistence (tasks-repo)
-  store/          # Zustand task store + pure task utilities & types
   hooks/          # Shared hooks (color scheme, theme)
 assets/           # Icons, splash, fonts
 ```
-
-Data flows one way: screens read/dispatch through the Zustand store
-(`src/store/use-tasks.ts`), which keeps tasks in memory and writes through to
-SQLite (`src/db/tasks-repo.ts`) as a best-effort side effect. If SQLite is
-unavailable (e.g. web without WASM setup), the app still works for the session —
-it just won't persist. Pure, framework-free logic (sorting, validation) lives in
-`src/store/task-utils.ts` and is unit-tested directly.
 
 The `@/*` path alias maps to `src/*` (see `tsconfig.json`).
 

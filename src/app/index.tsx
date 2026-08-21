@@ -1,94 +1,62 @@
-import { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import * as Device from 'expo-device';
+import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TaskEditModal } from '@/components/task-edit-modal';
-import { TaskRow } from '@/components/task-row';
+import { AnimatedIcon } from '@/components/animated-icon';
+import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
-import { sortActive } from '@/store/task-utils';
-import type { Task } from '@/store/types';
-import { useTasks } from '@/store/use-tasks';
 
-export default function TasksScreen() {
-  const theme = useTheme();
-  const tasks = useTasks((s) => s.tasks);
-  const addTask = useTasks((s) => s.addTask);
-  const toggleDone = useTasks((s) => s.toggleDone);
-  const toggleImportant = useTasks((s) => s.toggleImportant);
-  const editTask = useTasks((s) => s.editTask);
-  const removeTask = useTasks((s) => s.removeTask);
+function getDevMenuHint() {
+  if (Platform.OS === 'web') {
+    return <ThemedText type="small">use browser devtools</ThemedText>;
+  }
+  if (Device.isDevice) {
+    return (
+      <ThemedText type="small">
+        shake device or press <ThemedText type="code">m</ThemedText> in terminal
+      </ThemedText>
+    );
+  }
+  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  return (
+    <ThemedText type="small">
+      press <ThemedText type="code">{shortcut}</ThemedText>
+    </ThemedText>
+  );
+}
 
-  const [draft, setDraft] = useState('');
-  const [editing, setEditing] = useState<Task | null>(null);
-
-  const active = useMemo(() => sortActive(tasks), [tasks]);
-
-  const submit = () => {
-    addTask(draft);
-    setDraft('');
-  };
-
+export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <ThemedText type="subtitle" style={styles.heading}>
-          Tasks
+      <SafeAreaView style={styles.safeArea}>
+        <ThemedView style={styles.heroSection}>
+          <AnimatedIcon />
+          <ThemedText type="title" style={styles.title}>
+            Welcome to&nbsp;Expo
+          </ThemedText>
+        </ThemedView>
+
+        <ThemedText type="code" style={styles.code}>
+          get started
         </ThemedText>
 
-        <View style={[styles.addRow, { borderColor: theme.border }]}>
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            onSubmitEditing={submit}
-            placeholder="Add a task…"
-            placeholderTextColor={theme.textSecondary}
-            returnKeyType="done"
-            style={[styles.input, { color: theme.text }]}
-            accessibilityLabel="New task"
+        <ThemedView type="backgroundElement" style={styles.stepContainer}>
+          <HintRow
+            title="Try editing"
+            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
           />
-          <Pressable
-            onPress={submit}
-            style={[styles.addButton, { backgroundColor: theme.tint }]}
-            accessibilityRole="button"
-            accessibilityLabel="Add task"
-          >
-            <ThemedText style={styles.addLabel} type="smallBold">
-              Add
-            </ThemedText>
-          </Pressable>
-        </View>
+          <HintRow title="Dev tools" hint={getDevMenuHint()} />
+          <HintRow
+            title="Fresh start"
+            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
+          />
+        </ThemedView>
 
-        <FlatList
-          data={active}
-          keyExtractor={(t) => t.id}
-          renderItem={({ item }) => (
-            <TaskRow
-              task={item}
-              onToggleDone={toggleDone}
-              onToggleImportant={toggleImportant}
-              onPress={setEditing}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContent}
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={
-            <ThemedText themeColor="textSecondary" style={styles.empty}>
-              Nothing here yet. Capture whatever’s on your mind above ↑
-            </ThemedText>
-          }
-        />
+        {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
-
-      <TaskEditModal
-        task={editing}
-        onClose={() => setEditing(null)}
-        onSave={editTask}
-        onDelete={removeTask}
-      />
     </ThemedView>
   );
 }
@@ -96,52 +64,35 @@ export default function TasksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   safeArea: {
     flex: 1,
-    alignSelf: 'stretch',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    paddingHorizontal: Spacing.three,
-    gap: Spacing.three,
-  },
-  heading: {
-    paddingTop: Spacing.three,
-  },
-  addRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-    borderWidth: 1,
-    borderRadius: Spacing.three,
-    paddingLeft: Spacing.three,
-    paddingRight: Spacing.one,
-    paddingVertical: Spacing.one,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: Spacing.two,
-  },
-  addButton: {
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-  },
-  addLabel: {
-    color: '#ffffff',
-  },
-  listContent: {
-    paddingBottom: BottomTabInset + Spacing.four,
-    flexGrow: 1,
-  },
-  separator: {
-    height: Spacing.two,
-  },
-  empty: {
-    textAlign: 'center',
-    marginTop: Spacing.five,
     paddingHorizontal: Spacing.four,
+    alignItems: 'center',
+    gap: Spacing.three,
+    paddingBottom: BottomTabInset + Spacing.three,
+    maxWidth: MaxContentWidth,
+  },
+  heroSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    paddingHorizontal: Spacing.four,
+    gap: Spacing.four,
+  },
+  title: {
+    textAlign: 'center',
+  },
+  code: {
+    textTransform: 'uppercase',
+  },
+  stepContainer: {
+    gap: Spacing.three,
+    alignSelf: 'stretch',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.four,
+    borderRadius: Spacing.four,
   },
 });
