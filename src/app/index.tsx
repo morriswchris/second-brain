@@ -1,61 +1,51 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
+import { CaptureInput } from '@/components/capture-input';
+import { NoteCard } from '@/components/note-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useNotes } from '@/notes/notes-context';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+export default function CaptureScreen() {
+  const { notes, ready, addNote, removeNote } = useNotes();
 
-export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={styles.content}>
+            <ThemedView style={styles.header}>
+              <ThemedText type="subtitle">Capture</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Get it out of your head. It&apos;s saved offline, instantly.
+              </ThemedText>
+            </ThemedView>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+            <CaptureInput onCapture={addNote} />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
+            <FlatList
+              style={styles.list}
+              data={notes}
+              keyExtractor={(note) => note.id}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              contentContainerStyle={styles.listContent}
+              renderItem={({ item }) => <NoteCard note={item} onDelete={removeNote} />}
+              ListEmptyComponent={
+                ready ? (
+                  <ThemedText type="small" themeColor="textSecondary" style={styles.empty}>
+                    Nothing captured yet. Type a thought above and hit Capture.
+                  </ThemedText>
+                ) : null
+              }
+            />
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -64,35 +54,39 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: 'center',
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
     alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    alignItems: 'center',
+  },
+  flex: {
+    flex: 1,
+    alignSelf: 'stretch',
+  },
+  content: {
+    flex: 1,
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.three,
+    gap: Spacing.three,
+  },
+  header: {
+    gap: Spacing.one,
+  },
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    gap: Spacing.two,
+    paddingTop: Spacing.two,
+    paddingBottom: BottomTabInset + Spacing.four,
+  },
+  empty: {
+    textAlign: 'center',
+    paddingTop: Spacing.five,
   },
 });

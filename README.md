@@ -8,7 +8,7 @@ Native**, scaffolded for fast local development and on-device testing with
 
 | Layer      | Choice                                                                               |
 | ---------- | ------------------------------------------------------------------------------------ |
-| Framework  | [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/) (managed workflow)            |
+| Framework  | [Expo SDK 54](https://docs.expo.dev/versions/v54.0.0/) (managed workflow)            |
 | Runtime    | React Native 0.86 · React 19.2                                                       |
 | Routing    | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based, typed routes) |
 | Language   | TypeScript 6 (strict)                                                                |
