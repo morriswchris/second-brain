@@ -10,7 +10,6 @@ export function useColorScheme() {
   // Intentional one-time "have we hydrated on the client?" flag for static web
   // rendering — the server has no color scheme, so we defer to it until mount.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasHydrated(true);
   }, []);
 
