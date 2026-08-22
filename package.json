@@ -55,6 +55,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:ci": "jest --ci --coverage",
+    "eval": "jest --runInBand --testPathIgnorePatterns \"/node_modules/\" --testMatch \"**/*.eval.ts\"",
     "doctor": "npx expo-doctor"
   },
   "private": true
