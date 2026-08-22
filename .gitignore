@@ -44,3 +44,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Cached embedding models for brain evals
+.hf-cache/

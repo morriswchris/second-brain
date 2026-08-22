@@ -34,6 +34,12 @@ export async function createTransformersEmbedder(
   // the brain module; only the eval runner pays for it.
   const { pipeline, env } = await import('@huggingface/transformers');
 
+  // Let CI point the model cache at a stable, cacheable path (the default lives
+  // inside node_modules, which `npm ci` wipes each run).
+  if (process.env.BRAIN_MODEL_CACHE) {
+    env.cacheDir = process.env.BRAIN_MODEL_CACHE;
+  }
+
   // If a local path is given, run without touching the network.
   if (options.model?.startsWith('/') || process.env.BRAIN_EMBED_MODEL_PATH) {
     env.allowRemoteModels = false;

@@ -1,0 +1,80 @@
+name: Brain Eval
+
+# Scores the search/enrichment pipeline (the `brain` module) whenever that code
+# path changes, on PRs and on main. The general lint/typecheck/test gate lives
+# in ci.yml; this workflow adds the eval layer:
+#   - the deterministic synthetic eval (threshold-gated), and
+#   - the real-model matrix (MiniLM embeddings, plus Claude when a key is set).
+#
+# It's path-filtered so it only runs when brain code, its deps, or this workflow
+# change — not on every push.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/brain/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/brain-eval.yml'
+  pull_request:
+    paths:
+      - 'src/brain/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/brain-eval.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: brain-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    name: Enrichment & Search Eval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Deterministic, offline, threshold-gated. Fails the job on a real
+      # regression in enrichment or search quality.
+      - name: Synthetic eval
+        run: npm run eval
+
+      # Persist the downloaded embedding model across runs so MiniLM isn't
+      # re-fetched every time.
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: .hf-cache
+          key: brain-embed-${{ env.BRAIN_EMBED_MODEL || 'all-MiniLM-L6-v2' }}
+
+      # Real-model matrix. MiniLM downloads and runs on every trigger; the Claude
+      # configs run only when ANTHROPIC_API_KEY is set (forks / no secret skip
+      # them cleanly). Only the offline baseline gates the exit code, so model
+      # nondeterminism or a hub hiccup can't fail the job — the numbers land in
+      # the run's job summary.
+      - name: Model eval matrix
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BRAIN_MODEL_CACHE: .hf-cache
+          BRAIN_EVAL_TRIALS: '2'
+        shell: bash
+        run: |
+          set -eo pipefail
+          {
+            echo '## Brain model eval matrix'
+            echo ''
+            echo '```'
+            npm run eval:model
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
