@@ -9,24 +9,36 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    border: '#E0E1E6',
-    tint: '#3c87f7',
-    tintText: '#ffffff',
+    text: '#0E0E12',
+    background: '#F4F4F7',
+    /** Raised surfaces: the composer and note cards. */
+    surface: '#FFFFFF',
+    backgroundElement: '#EBEBF0',
+    backgroundSelected: '#E0E0E7',
+    textSecondary: '#6B6B76',
+    textTertiary: '#9D9DA8',
+    border: '#E3E3EA',
+    tint: '#3B5BFF',
+    /** Low-emphasis accent wash for badges, focus rings and icon wells. */
+    tintSoft: '#E6EAFF',
+    tintText: '#FFFFFF',
+    danger: '#E5484D',
+    shadow: 'rgba(26, 26, 64, 0.07)',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    border: '#2E3135',
-    tint: '#3c87f7',
-    tintText: '#ffffff',
+    text: '#F3F3F6',
+    background: '#0A0A0D',
+    surface: '#16161B',
+    backgroundElement: '#1E1E24',
+    backgroundSelected: '#2A2A32',
+    textSecondary: '#9B9BA6',
+    textTertiary: '#64646E',
+    border: '#25252C',
+    tint: '#8193FF',
+    tintSoft: '#1C2045',
+    tintText: '#0A0A14',
+    danger: '#FF6369',
+    shadow: 'rgba(0, 0, 0, 0.45)',
   },
 } as const;
 
@@ -65,6 +77,13 @@ export const Spacing = {
   four: 24,
   five: 32,
   six: 64,
+} as const;
+
+export const Radius = {
+  sm: 10,
+  md: 16,
+  lg: 22,
+  pill: 999,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

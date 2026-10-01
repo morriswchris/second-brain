@@ -49,3 +49,57 @@ export function formatRelativeTime(createdAt: number, now: number = Date.now()):
 
   return new Date(createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
+
+/** A run of notes captured on the same local calendar day. */
+export type NoteSection = {
+  /** Stable key for the day, `YYYY-M-D` in local time. */
+  key: string;
+  /** Human label: "Today", "Yesterday", a weekday this week, else a date. */
+  title: string;
+  data: Note[];
+};
+
+function dayKey(time: number): string {
+  const d = new Date(time);
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+function startOfDay(time: number): number {
+  const d = new Date(time);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+/** Label for the day a note was captured, relative to `now`. */
+export function formatDayLabel(time: number, now: number = Date.now()): string {
+  const diffDays = Math.round((startOfDay(now) - startOfDay(time)) / 86_400_000);
+  if (diffDays <= 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return new Date(time).toLocaleDateString(undefined, { weekday: 'long' });
+
+  const sameYear = new Date(time).getFullYear() === new Date(now).getFullYear();
+  return new Date(time).toLocaleDateString(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    ...(sameYear ? {} : { year: 'numeric' }),
+  });
+}
+
+/**
+ * Split newest-first notes into per-day sections (for a `SectionList`),
+ * preserving order within and across days.
+ */
+export function groupNotesByDay(notes: Note[], now: number = Date.now()): NoteSection[] {
+  const sections: NoteSection[] = [];
+  for (const note of notes) {
+    const key = dayKey(note.createdAt);
+    const last = sections[sections.length - 1];
+    if (last && last.key === key) {
+      last.data.push(note);
+    } else {
+      sections.push({ key, title: formatDayLabel(note.createdAt, now), data: [note] });
+    }
+  }
+  return sections;
+}
