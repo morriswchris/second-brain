@@ -1,6 +1,6 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { AppIcon } from '@/components/app-icon';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { formatRelativeTime } from '@/notes/note-utils';
@@ -41,7 +41,7 @@ export function NoteCard({ note, onDelete, now }: NoteCardProps) {
         ]}
       >
         {({ pressed }) => (
-          <Ionicons name="close" size={16} color={pressed ? theme.danger : theme.textTertiary} />
+          <AppIcon name="close" size={16} color={pressed ? theme.danger : theme.textTertiary} />
         )}
       </Pressable>
     </View>

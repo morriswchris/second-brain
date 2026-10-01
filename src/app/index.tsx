@@ -1,9 +1,9 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, SectionList, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppIcon } from '@/components/app-icon';
 import { CaptureInput } from '@/components/capture-input';
 import { NoteCard } from '@/components/note-card';
 import { ThemedText } from '@/components/themed-text';
@@ -97,7 +97,7 @@ function EmptyState() {
   return (
     <View style={styles.empty}>
       <View style={[styles.emptyIcon, { backgroundColor: theme.tintSoft }]}>
-        <Ionicons name="sparkles" size={24} color={theme.tint} />
+        <AppIcon name="sparkles" size={24} color={theme.tint} />
       </View>
       <ThemedText type="smallBold" style={styles.emptyTitle}>
         A clear head starts here

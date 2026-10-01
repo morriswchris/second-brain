@@ -1,7 +1,7 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppIcon } from '@/components/app-icon';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -40,7 +40,7 @@ export default function SearchScreen() {
             accessibilityState={{ disabled: true }}
             style={[styles.searchField, { backgroundColor: theme.backgroundElement }]}
           >
-            <Ionicons name="search" size={18} color={theme.textTertiary} />
+            <AppIcon name="search" size={18} color={theme.textTertiary} />
             <ThemedText
               themeColor="textTertiary"
               style={styles.searchPlaceholder}
@@ -68,7 +68,7 @@ export default function SearchScreen() {
                     { backgroundColor: theme.surface, borderColor: theme.border },
                   ]}
                 >
-                  <Ionicons name="chatbubble-ellipses-outline" size={16} color={theme.tint} />
+                  <AppIcon name="chatbubble-ellipses-outline" size={16} color={theme.tint} />
                   <ThemedText type="small" style={styles.exampleText}>
                     {question}
                   </ThemedText>
@@ -84,7 +84,7 @@ export default function SearchScreen() {
             ]}
           >
             <View style={[styles.statusIcon, { backgroundColor: theme.tintSoft }]}>
-              <Ionicons name="layers-outline" size={20} color={theme.tint} />
+              <AppIcon name="layers-outline" size={20} color={theme.tint} />
             </View>
             <View style={styles.statusText}>
               <ThemedText type="smallBold">

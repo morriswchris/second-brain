@@ -1,8 +1,8 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { AppIcon } from '@/components/app-icon';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -79,7 +79,7 @@ export function CaptureInput({ onCapture }: CaptureInputProps) {
             },
           ]}
         >
-          <Ionicons
+          <AppIcon
             name="arrow-up"
             size={20}
             color={canCapture ? theme.tintText : theme.textTertiary}

@@ -1,7 +1,7 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
+import { AppIcon } from '@/components/app-icon';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -35,7 +35,7 @@ export default function AppTabs() {
         options={{
           title: 'Capture',
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? 'create' : 'create-outline'} color={color} size={size} />
+            <AppIcon name={focused ? 'create' : 'create-outline'} color={color} size={size} />
           ),
         }}
       />
@@ -44,7 +44,7 @@ export default function AppTabs() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? 'search' : 'search-outline'} color={color} size={size} />
+            <AppIcon name={focused ? 'search' : 'search-outline'} color={color} size={size} />
           ),
         }}
       />
