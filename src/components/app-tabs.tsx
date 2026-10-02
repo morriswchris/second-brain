@@ -10,17 +10,26 @@ export default function AppTabs() {
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      tintColor={colors.text}
-      labelStyle={{ selected: { color: colors.text } }}
+      tintColor={colors.tint}
+      iconColor={colors.textTertiary}
+      indicatorColor={colors.tintSoft}
+      labelStyle={{ color: colors.textTertiary, selected: { color: colors.tint } }}
+      minimizeBehavior="onScrollDown"
     >
       <NativeTabs.Trigger name="index">
         <Label>Capture</Label>
-        <Icon src={require('@/assets/images/tabIcons/home.png')} />
+        <Icon
+          sf={{ default: 'square.and.pencil', selected: 'square.and.pencil' }}
+          androidSrc={require('@/assets/images/tabIcons/home.png')}
+        />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="explore">
         <Label>Search</Label>
-        <Icon src={require('@/assets/images/tabIcons/explore.png')} />
+        <Icon
+          sf={{ default: 'magnifyingglass', selected: 'magnifyingglass' }}
+          androidSrc={require('@/assets/images/tabIcons/explore.png')}
+        />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
