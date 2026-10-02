@@ -9,7 +9,8 @@ import { useTheme } from '@/hooks/use-theme';
 
 type NoteCardProps = {
   note: Note;
-  onDelete: (id: string) => void;
+  /** Omit for a read-only card (e.g. a note cited in a search answer). */
+  onDelete?: (id: string) => void;
   /** Injectable clock so relative-time rendering is deterministic in tests. */
   now?: number;
 };
@@ -30,20 +31,22 @@ export function NoteCard({ note, onDelete, now }: NoteCardProps) {
           {formatRelativeTime(note.createdAt, now)}
         </ThemedText>
       </View>
-      <Pressable
-        onPress={() => onDelete(note.id)}
-        accessibilityRole="button"
-        accessibilityLabel="Delete thought"
-        hitSlop={Spacing.two}
-        style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
-          styles.delete,
-          (pressed || hovered) && { backgroundColor: theme.backgroundElement },
-        ]}
-      >
-        {({ pressed }) => (
-          <AppIcon name="close" size={16} color={pressed ? theme.danger : theme.textTertiary} />
-        )}
-      </Pressable>
+      {onDelete && (
+        <Pressable
+          onPress={() => onDelete(note.id)}
+          accessibilityRole="button"
+          accessibilityLabel="Delete thought"
+          hitSlop={Spacing.two}
+          style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
+            styles.delete,
+            (pressed || hovered) && { backgroundColor: theme.backgroundElement },
+          ]}
+        >
+          {({ pressed }) => (
+            <AppIcon name="close" size={16} color={pressed ? theme.danger : theme.textTertiary} />
+          )}
+        </Pressable>
+      )}
     </View>
   );
 }
